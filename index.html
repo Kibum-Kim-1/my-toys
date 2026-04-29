@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will you be my Valentine?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       💛 여기서 색상을 바꿀 수 있어요!
+       ============================================================ */
+    :root {
+      --color-bg: #fff0f3;          /* 배경 색 */
+      --color-card: #ffffff;        /* 카드 색 */
+      --color-yes: #e8587a;         /* Yes 버튼 색 */
+      --color-yes-hover: #c9395d;   /* Yes 버튼 호버 색 */
+      --color-text: #3a2030;        /* 글자 색 */
+      --color-sub: #a07080;         /* 서브 글자 색 */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hi Melody', sans-serif;
+      background: var(--color-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 배경 하트 */
+    .bg-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-heart {
+      position: absolute;
+      opacity: 0.12;
+      animation: floatUp linear infinite;
+      user-select: none;
+      font-size: 20px;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0.12; }
+      100% { transform: translateY(-20vh) rotate(30deg); opacity: 0; }
+    }
+
+    /* 카드 */
+    .card {
+      background: var(--color-card);
+      border-radius: 24px;
+      box-shadow: 0 8px 48px rgba(200, 60, 100, 0.13);
+      padding: 2.5rem 2rem 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: fadeIn 0.6s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       💛 사진 영역
+       - 아래 <img> 태그의 src="" 안에 사진 파일 경로를 넣으면 돼요
+         예) src="photo.jpg"  (같은 폴더에 사진이 있을 때)
+       - 사진이 없으면 이 .photo-wrap 전체를 지워도 됨
+       ============================================================ */
+    .photo-wrap {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 1.5rem;
+      border: 4px solid #f9c8d4;
+    }
+    .photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 사진 없을 때 보여줄 이모지 플레이스홀더 */
+    .photo-placeholder {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #fde8ee;
+      border: 4px solid #f9c8d4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      margin: 0 auto 1.5rem;
+    }
+
+    /* 제목 */
+    .title {
+      font-family: 'Hi Melody', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--color-text);
+      line-height: 1.35;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--color-sub);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    /* 버튼 */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      position: relative;
+      min-height: 52px;
+    }
+    .btn-yes {
+      background: var(--color-yes);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0 2rem;
+      height: 48px;
+      font-size: 16px;
+      font-family: 'Hi Melody', sans-serif;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-yes:hover  { background: var(--color-yes-hover); transform: scale(1.05); }
+    .btn-yes:active { transform: scale(0.97); }
+
+    .btn-no {
+      background: transparent;
+      color: var(--color-sub);
+      border: 1.5px solid #e8c0cc;
+      border-radius: 50px;
+      padding: 0 1.4rem;
+      height: 48px;
+      font-size: 14px;
+      font-family: 'Hi Melody', sans-serif;
+      cursor: pointer;
+      transition: font-size 0.2s;
+      white-space: nowrap;
+    }
+
+    /* Yes 화면 */
+    #yes-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .yes-emoji { font-size: 72px; animation: popIn 0.5s cubic-bezier(.2,1.5,.5,1); }
+    @keyframes popIn {
+      0%   { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+    .yes-title {
+      font-family: 'Hi Melody', serif;
+      font-size: 24px;
+      color: var(--color-text);
+    }
+
+    /* ============================================================
+       💛 Yes 눌렀을 때 나오는 문구는 아래 HTML에서 수정하세요!
+       ============================================================ */
+    .yes-msg {
+      font-size: 15px;
+      color: var(--color-sub);
+      line-height: 1.7;
+    }
+
+    /* 컨페티 */
+    .confetti {
+      position: fixed;
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      animation: fall 2.5s ease-in forwards;
+      pointer-events: none;
+      z-index: 999;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 배경 떠다니는 하트 -->
+  <div class="bg-hearts" id="bgHearts"></div>
+
+  <div class="card" id="mainCard">
+
+    <!-- ============================================================
+         💛 사진 넣는 방법:
+         1) 아래 "photo-placeholder" 줄을 지우고
+         2) "photo-wrap" 주석을 해제(<!-- 제거)하세요
+         3) src="" 안에 파일명 입력 (예: src="우리사진.jpg")
+         ============================================================
+    -->
+
+    <div class="photo-wrap">
+      <img src="Tennis.jpg" alt="우리 사진" />
+    </div>
+
+
+    <!-- ============================================================
+         💛 이름과 문구 수정 부분
+         ============================================================ -->
+    <h1 class="title">
+      혜성아,<br>나랑 데이트 할래? 💕
+      <!-- 👆 "민지야" 부분을 여자친구 이름으로 바꾸세요 -->
+    </h1>
+    <p class="subtitle">
+      딱 한 번만 기회를 줘 🥺
+      <!-- 👆 이 문구도 원하는 대로 바꾸세요 -->
+    </p>
+
+    <div class="btn-row" id="btnRow">
+      <button class="btn-yes" id="yesBtn">응, 좋아 💕</button>
+      <!-- 👆 Yes 버튼 글자도 바꿀 수 있어요 -->
+      <button class="btn-no" id="noBtn">싫어</button>
+    </div>
+
+  </div>
+
+  <!-- Yes 눌렀을 때 화면 -->
+  <div class="card" id="yesScreen" style="display:none">
+    <div id="yes-screen">
+      <div class="yes-emoji">💖</div>
+
+      <!-- ============================================================
+           💛 Yes 눌렀을 때 나오는 제목 & 메시지 수정
+           ============================================================ -->
+      <p class="yes-title">나 진짜 행복해!!! 🎉</p>
+      <p class="yes-msg">
+        네가 그렇게 말해줘서<br>
+        세상 다 가진 기분이야 ☁️✨
+      </p>
+      <!-- 👆 이 문구들을 원하는 내용으로 바꾸세요 -->
+
+    </div>
+  </div>
+
+  <script>
+    // 배경 하트 생성
+    const bgHearts = document.getElementById('bgHearts');
+    const heartEmojis = ['🩷','❤️','🧡','💛','💜','🩵','💕'];
+    for (let i = 0; i < 16; i++) {
+      const h = document.createElement('span');
+      h.className = 'bg-heart';
+      h.textContent = heartEmojis[i % heartEmojis.length];
+      h.style.left = (Math.random() * 100) + '%';
+      h.style.animationDuration = (5 + Math.random() * 7) + 's';
+      h.style.animationDelay = (Math.random() * 8) + 's';
+      h.style.fontSize = (14 + Math.random() * 18) + 'px';
+      bgHearts.appendChild(h);
+    }
+
+    // No 버튼 도망가기
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const noLabels = ['싫어','정말?','다시 생각해봐','제발...','마지막 기회!','응 해줘!'];
+    let noCount = 0;
+
+    function runAway() {
+      noCount++;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const x = Math.random() * (vw - 100);
+      const y = Math.random() * (vh - 60);
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = x + 'px';
+      noBtn.style.top  = y + 'px';
+      noBtn.style.zIndex = 50;
+      noBtn.textContent = noLabels[Math.min(noCount, noLabels.length - 1)];
+      noBtn.style.fontSize = Math.max(10, 14 - noCount) + 'px';
+      yesBtn.style.fontSize = Math.min(20, 16 + noCount * 1.2) + 'px';
+    }
+
+    noBtn.addEventListener('mouseover', runAway);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); runAway(); });
+
+    // Yes 버튼
+    yesBtn.addEventListener('click', () => {
+      document.getElementById('mainCard').style.display = 'none';
+      const ys = document.getElementById('yesScreen');
+      ys.style.display = 'block';
+      document.getElementById('yes-screen').style.display = 'flex';
+
+      // 컨페티
+      const colors = ['#e8587a','#f0a0b8','#b8a0e8','#80d8c0','#f8d080'];
+      for (let i = 0; i < 50; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = (Math.random() * 100) + 'vw';
+        c.style.top  = '-10px';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDelay = (Math.random() * 1.2) + 's';
+        c.style.width  = (6 + Math.random() * 7) + 'px';
+        c.style.height = c.style.width;
+        document.body.appendChild(c);
+      }
+    });
+  </script>
+</body>
+</html>
